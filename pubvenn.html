@@ -12,77 +12,19 @@
 
 <title>PubVenn: Visual PubMed Search</title>
 
-<style>
-
-.venntooltip {
-  position: absolute;
-  text-align: center;
-  background: #333;
-  color: #ddd;
-  padding: 2px;
-  border: 0px;
-  border-radius: 8px;
-  opacity: 0;
-}
-
-#vennresults dl{
-font-size: 90%;
-}
-
-#vennresults dd {
-color: LightSlateGray;
-padding-left: .8em;
-margin-bottom: .5em;
-}
-
-.hideMe {
-display: none;
-}
-
-.vennMsg {
-color:gray;
-font-size:2em;
-text-align: center
-}
-
-.explanation {
-    position: absolute;
-    bottom: 1em;
-    color:gray;
-    right: 3em;
-} 
-
-.magglass {
-    position: absolute;
-    right: 2em;
-    z-index: 10;
-} 
-
-.zoom {
-   float: right;
-   color: white;
-   background-color: DarkGray;
-}
-
-.pastsearch {
-color:blue;
-text-decoration: underline;
-cursor: pointer;
-}
-
-</style>
 </head> 
 <body>
 
 <div class="container">
       <div class="jumbotron">
         <h1>PubVenn</h1>      
-        <p>Explore your PubMed search with Venn diagrams!</p>      
+        <p>Explore your PubMed search with Venn diagrams!</p> 
+        <a id="about" class="label label-default" href="about.html">About PubVenn</a>		
       </div>
 
 <div class="row">
 	<div class="col-sm-7 col-md-7 col-lg-7">
-		<div class="well well-sm">	
+	
 		<div class="input-group input-group-lg">
 			<input type="text" id="search" class="form-control">
 			<span class="input-group-btn">
@@ -94,7 +36,7 @@ cursor: pointer;
 				<label for="detailed">Detailed view</label>
 				<input id="detailed" type="checkbox">
 			</div>
-		</div>
+
 
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -103,7 +45,8 @@ cursor: pointer;
 			<div class="panel-body">
 				<div class="venn">
 					<p class="vennMsg">Enter your PubMed search above</p>
-				</div> 	
+				</div> 
+				<div class="simple_example hideMe"></div>				
 
 			</div>
 			<div class="diaginfo panel-footer hideMe">Select an area or intersection on the venn diagram to change your search&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -211,23 +154,24 @@ function esearch(term) {
 	usehistory: 'y',
 	term: term,
 	retmode: 'json',
-	retmax: 0
+	retmax: 0,
+	email: 'ed_sperr@hotmail.com',
+	tool: 'pubvenn'
 	}
      });
 }
-
 
 function getOverlaps() {
 var results;
 var count;
 var searches =[];	
-
+console.log(JSON.stringify(sets)); 
 for (index = 0; index < sets.length; index++) {
      for (j = index; j < (sets.length - 1); j++) {
          search = sets[index].label + " AND " + sets[j+1].label
 	 //send sets and terms to our temporary 'search' object
 	 mySearch = new setSearch([index,(j+1)], search);  
-         searches.push(mySearch);	 
+         searches.push(mySearch);
        }    
    }
 
@@ -323,7 +267,7 @@ function startSearch(term) {
     searchCount++;
 
      $( ".venn" ).append("<div class='vennMsg'><p>Loading your diagram. Please wait...</p><img src='loading-bars.svg'></div> ")
-     esearch(term) 
+     esearch(term)
      .then(function( data ) {
 	getDocs(data);
         var numResults = Number(data.esearchresult.count);
@@ -481,27 +425,68 @@ diagram.svg.selectAll("path")
 
 $( ".diaginfo" ).removeClass( "hideMe" ); 
 $(".venn").append('<a id="getDLimage" href="#">View/Download image</a>');
+
+        var a = document.getElementById("venn");
+ var svgDoc;
+ a.addEventListener("load",function() {
+      svgDoc = a.contentDocument;
+      alert("SVG contentDocument Loaded!");
+ }, false);
 //getDLimage ();
 }
 
 function getDLimage () {
-    //still not ideal, but canvas doesn't work consistently -- try again?
+    //for any way we do this, we need to modify the original diagram some. So we can just redraw it into a hidden <div />
+    var brandstr = 'PubMed citation sets for  "' + searchstr + '"';
+    venn.drawD3Diagram(d3.select(".simple_example"), sets, 500, 500);
+        
     var fixtext = d3.selectAll("text")
        .attr("font-family","sans-serif");
    
-    var brandstr = 'PubMed citation sets for  "' + searchstr + '"';
-   
-    var brandme = d3.select("svg")
+    var brandme = d3.select('.simple_example svg')
         .append("text")
 	.text(brandstr)
         .attr("x", "20")
 	.attr("y", "20");
+    //use d3 to grab our new diagram and pass it through the serializer -- then create a data_uri
+    var xmlString = (new XMLSerializer).serializeToString(d3.select('.simple_example svg').node());  
+     var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);   
     
-    var svg = document.getElementsByTagName('svg')[0];    
-    var svg_xml = (new XMLSerializer).serializeToString(svg);   // extract the data as SVG text
-    console.log(svg_xml);	    
-    var data_uri = "data:image/svg+xml;base64," + window.btoa(svg_xml);
-    window.open(data_uri);
+    //we could just pass the string to a data_uri and open a new window   
+
+    //window.open(data_uri);
+    
+    //...or we could try using a html5 canvas here to convert it to a PNG and make saving it more obvious
+    //TEST on Safari and Chrome
+    var image = new Image;
+    image.src = data_uri;
+    image.onload = function(e) {
+    
+        var canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        var context = canvas.getContext("2d");
+        context.clearRect(0, 0, image.width, image.height);
+        context.drawImage(image, 0, 0);
+
+        var a = document.createElement("a");
+        a.download = "file.png";
+        a.href = canvas.toDataURL("image/png");
+	window.open(a.href);
+        //$(".venn .panel-footer").append('<a href="' + a.href + '">View/Save Image</a>');
+	}
+  
+
+  
+//myCanvas = document.createElement('canvas');    
+//var ctx = myCanvas.getContext('2d');
+//var img = new Image;
+//give the source *after* we call our onload function?
+//img.onload = function(){ ctx.drawImage(img,0,0); };
+//img.src = "data:image/svg+xml;base64,"+btoa(xmlString);    
+        
+
 }
 
 })
