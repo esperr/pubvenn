@@ -1,0 +1,73 @@
+body {
+		background-color: #f7f3e8; 
+	}
+.jumbotron {
+color: white;
+background-color: rgb(70,131,193);	
+}
+
+.btn-default {
+	background-color: rgb(41,82,124);
+	color: white;
+	}
+	
+.venntooltip {
+  position: absolute;
+  text-align: center;
+  background: #333;
+  color: #ddd;
+  padding: 2px;
+  border: 0px;
+  border-radius: 8px;
+  opacity: 0;
+}
+
+#vennresults dl{
+font-size: 90%;
+}
+
+#vennresults dd {
+color: LightSlateGray;
+padding-left: .8em;
+margin-bottom: .5em;
+}
+
+.hideMe {
+display: none;
+}
+
+.vennMsg {
+color:gray;
+font-size:2em;
+text-align: center
+}
+
+.explanation {
+    position: absolute;
+    bottom: 1em;
+    color:gray;
+    right: 3em;
+} 
+
+.zoom {
+   float: right;
+   color: white;
+   background-color: DarkGray;
+}
+
+.pastsearch {
+color:blue;
+text-decoration: underline;
+cursor: pointer;
+}
+
+#about {
+	float: right;
+	color: black;
+	background-color: white;
+	font-size: 125%;
+}
+
+#about:hover, #about:focus {
+	background-color: rgb(202,220,237);
+}
