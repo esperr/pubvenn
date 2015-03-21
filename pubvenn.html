@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="custom.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="http://d3js.org/d3.v2.min.js"></script>
-<script src="venn_mod.js"></script>
+<script src="new_venn.js"></script>
 <script src="svg-pan-zoom.js"></script>
 
 <title>PubVenn: Visual PubMed Search</title>
@@ -81,16 +82,18 @@ cursor: pointer;
 
 <div class="row">
 	<div class="col-sm-7 col-md-7 col-lg-7">
+		<div class="well well-sm">	
 		<div class="input-group input-group-lg">
 			<input type="text" id="search" class="form-control">
 			<span class="input-group-btn">
-				<button id="runsearch" class="btn btn-default" type="button">Venn Search!</button>
+				<button id="runsearch" class="btn btn-default" type="button">Search</button>
 			</span>
+			
 		</div>
-		
-		<div>
-			<label for="detailed">Detailed view</label>
-			<input id="detailed" type="checkbox">
+			<div class="detailed">
+				<label for="detailed">Detailed view</label>
+				<input id="detailed" type="checkbox">
+			</div>
 		</div>
 
 		<div class="panel panel-default">
@@ -100,8 +103,11 @@ cursor: pointer;
 			<div class="panel-body">
 				<div class="venn">
 					<p class="vennMsg">Enter your PubMed search above</p>
-				</div>       
+				</div> 	
+
 			</div>
+			<div class="diaginfo panel-footer hideMe">Select an area or intersection on the venn diagram to change your search&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<button id="ztrigger" type="button" class="btn btn-default">Zoom</button></div>
 		</div>
 		
 		<div id="past" class="panel panel-default hideMe">
@@ -126,8 +132,9 @@ cursor: pointer;
 			</div>
 			<div class="panel-footer"></div>
 		</div>
-
 	</div>
+	<div id="hidden" class="hideMe"></div>
+
 </div>
 </div>
 
@@ -137,6 +144,7 @@ cursor: pointer;
 
 
 (function() {
+overlapcalls = 0;
 var sets = [];
 var overlaps = [];
 var searches = [];
@@ -166,7 +174,6 @@ var searchCount = 0;
     });
 
 function vennresults (searchterms, citenum) {
-     console.log(JSON.stringify(searchterms)); 
      if (typeof searchterms == "object") {
      var newsearchterms = searchterms.map(function(term) {
      return sets[term].label;
@@ -213,7 +220,7 @@ function esearch(term) {
 function getOverlaps() {
 var results;
 var count;
-
+var searches =[];	
 
 for (index = 0; index < sets.length; index++) {
      for (j = index; j < (sets.length - 1); j++) {
@@ -224,7 +231,8 @@ for (index = 0; index < sets.length; index++) {
        }    
    }
 
-console.log(JSON.stringify(searches));	
+	   
+
 $.each(searches, function (i, search) {
      esearch(searches[i].terms)
      .then(function( data ) {
@@ -246,12 +254,11 @@ function getSimpleSets(termsarray, possibles) {
 	if (numResults != 0) {
 		mySet = new setSet(termsarray[i], numResults);
 		sets.push(mySet);
+		if (sets.length == possibles) { getOverlaps(); }    		
 	} 
-    if (sets.length >= possibles) { getOverlaps(); }    	
      });
- 
     });
-    getOverlaps();
+    //getOverlaps();
 }
 
 function getDocs(data) {
@@ -325,7 +332,7 @@ function startSearch(term) {
 	        $(".venn").empty();
 		document.getElementById("translation").innerHTML = '<div class="alert alert-danger" role="alert">Nothing found for this search. Please try again</div>.';
 		$("#cites dl").empty();
-		} else if (data.esearchresult.translationset.length < 1) {
+	} else if (data.esearchresult.translationset.length < 1) {
 		$(".venn").empty();
 		//do something to telll them there's no drawing coming...
 		$(".venn").append("<p class='vennMsg'>Only one term found. No diagram shown...</p>");
@@ -335,12 +342,16 @@ function startSearch(term) {
 	}
 	
 	if (!detailed.checked ) {
-		var termsarray = term.split(/and|or|not/i);
-		if (termsarray.length<2) {
+		var termsarray = term.split(/ and | or | not /i);
+		var possibleTerms = termsarray.length;
+		if (data.esearchresult.errorlist) {
+			possibleTerms = possibleTerms - Number(data.esearchresult.errorlist.phrasesnotfound.length);
+		}		
+		if (possibleTerms<2) {
 			$(".venn").empty();
-			$(".venn").append('<p class="vennMsg">Only one term entered. Enter more terms or choose "detailed" to show venn diagram.</p>');
+			$(".venn").append('<p class="vennMsg">Only one valid term entered. Enter more terms or choose "detailed" to show venn diagram.</p>');
 		} else {
-			getSimpleSets(termsarray, Number(data.esearchresult.translationset.length));
+			getSimpleSets(termsarray, possibleTerms);			
 		}
 	} else {
 		$.each( data.esearchresult.translationstack, function( i, item ) {
@@ -358,8 +369,8 @@ function startSearch(term) {
 
 //trigger zoom
 
-  $( ".venn" ).on( "click", "button", function() {
-  //$("#ztrigger").click(function(){
+  //$( ".venn" ).on( "click", "button", function() {
+  $("#ztrigger").click(function(){
   $( "#ztrigger" ).addClass( "hideMe" )
        var nukeviewbox = d3.select("svg")
        .attr("viewbox",null)
@@ -384,7 +395,6 @@ sets = venn.venn(sets, overlaps);
 
 // draw the diagram in the 'venn' div
 var diagram = venn.drawD3Diagram(d3.select(".venn"), sets, 500, 500);
-//var colours = d3.scale.category20c();
 
 // add a tooltip showing the size of each set/intersection
 var tooltip = d3.select("body").append("div")
@@ -396,9 +406,14 @@ d3.selection.prototype.moveParentToFront = function() {
   });
 };
 
-//set ourselves a handle for the SVG diagram
-var setid = d3.select("svg").attr("id","venn");    
-
+//set ourselves a handle for the SVG diagram and make it responsive instead of fixed
+var setid = d3.select("svg").attr("id","venn")   
+			.attr("width", null)
+                	.attr("height", null)
+			.attr("viewBox", "0 0 500 500")
+			.attr("preserveAspectRatio", "xMinYMin meet")
+			.attr("class", "svg-content");
+			
 // hover on all the circles
 diagram.circles
     .style("stroke-opacity", 0)
@@ -464,8 +479,7 @@ diagram.svg.selectAll("path")
 	vennresults(d.sets, d.size);
     })
 
-$(".venn").append("<div class='panel-footer'>Select an area or intersection on the venn diagram to change your search&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>");
-$(".venn .panel-footer").append('<button id="ztrigger" type="button" class="btn btn-default">Zoom</button>');
+$( ".diaginfo" ).removeClass( "hideMe" ); 
 $(".venn").append('<a id="getDLimage" href="#">View/Download image</a>');
 //getDLimage ();
 }
@@ -488,7 +502,6 @@ function getDLimage () {
     console.log(svg_xml);	    
     var data_uri = "data:image/svg+xml;base64," + window.btoa(svg_xml);
     window.open(data_uri);
-
 }
 
 })
