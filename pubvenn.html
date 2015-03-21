@@ -6,9 +6,8 @@
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="custom.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.v2.js"></script>
 <script src="venn.js"></script>
-<script src="svg-pan-zoom.js"></script>
 <script src="numeric-1.2.6.min.js"></script>
 <script src="mds.js"></script>
 <title>PubVenn: Visual PubMed Search</title>
@@ -50,9 +49,8 @@
 				<div class="hidden_diagram "></div>				
 
 			</div>
-			<div class="diaginfo panel-footer hideMe">Select an area or intersection on the venn diagram to change your search&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<button id="ztrigger" type="button" class="btn btn-default">Zoom</button></div>
-		</div>
+			<div class="diaginfo panel-footer hideMe">Select an area or intersection on the venn diagram to change your search. Double-click to zoom.</div>
+			</div>
 		
 		<div id="past" class="panel panel-default hideMe">
 			<div class="panel-heading">
@@ -120,11 +118,9 @@ var searchCount = 0;
 
 function vennresults (d) {
      if (d.sets.length > 1) {
-	console.log(d.sets);
 	var newsearchterms = d.sets.map(function(term) {
 		return sets[term].label;
 	});
-	console.log(newsearchterms);
         searchterms = newsearchterms.join(" AND ");
      } else {
 	searchterms = d.label;
@@ -179,7 +175,7 @@ function getOLCounts() {
 		setTimeout(getOLCounts, 300);
 	} else {
 		drawVennDiagram ();
-	}
+		}
 	});
 }
 
@@ -217,7 +213,6 @@ function getSimpleSets(termsarray, possibles) {
 }
 
 function getDocs(data) {
-     //if detailed checked, do all the below, otherwise, just pass the search and get the number? 	
      var query_key = data.esearchresult.querykey;
      var WebEnv = data.esearchresult.webenv;
      var translation = data.esearchresult.querytranslation;
@@ -322,36 +317,29 @@ function startSearch(term) {
 });
 }
 
-//trigger zoom
 
-  //$( ".venn" ).on( "click", "button", function() {
-  $("#ztrigger").click(function(){
-  $( "#ztrigger" ).addClass( "hideMe" )
-       var nukeviewbox = d3.select("svg")
-       .attr("viewbox",null)
-       .attr("width","500")
-       .attr("height","500");    
-  
-        svgPanZoom('#venn', {
-          zoomEnabled: true,
-          controlIconsEnabled: true,
-          fit: true,
-          center: true
-   });
-    });   
 
 function drawVennDiagram () {
 $(".venn").empty();
 
+var zoom = d3.behavior.zoom()
+    .translate([0, 0])
+    .scale(1)
+    .scaleExtent([1, 8])
+    .on("zoom", zoomed);
+    
 var chart = venn.VennDiagram()
                  .width(500)
-                 .height(500)   
-		 .layoutFunction(
-                    function(d) { return venn.venn(d, { initialLayout: venn.classicMDSLayout });}
-                );
+                 .height(500);
+		 //include this for MD5 layout -- supposedly better, but some weird (broken) edge cases...
+		// .layoutFunction(
+                 //   function(d) { return venn.venn(d, { initialLayout: venn.classicMDSLayout });}
+                //);
 
 var div = d3.select(".venn")
 div.datum(sets).call(chart);
+
+var svg = d3.select("svg").call(zoom);
 
 var tooltip = d3.select("body").append("div")
     .attr("class", "venntooltip");
@@ -397,6 +385,10 @@ div.selectAll("g")
         vennresults(d);      
     });
   
+function zoomed() {
+  svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}
+
 //set ourselves a handle for the SVG diagram and make it responsive instead of fixed
 var setid = d3.select("svg").attr("id","venn")   
 			.attr("width", null)
