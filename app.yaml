@@ -1,0 +1,35 @@
+application: pubvenn
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: /
+  static_files: static_files/pubvenn.html
+  
+- url: /(.*\.html)
+  mime_type: text/html
+  static_files: static_files/\1
+  expiration: "1h"
+  
+- url: /(.*\.js)
+  mime_type: text/javascript
+  static_files: static_files/\1
+  
+- url: /css
+  static_dir: static_files/css
+  
+- url: /images
+  static_dir: static_files/images
+  
+#all images and support file (css, fonts...): return file if found, 
+#otherwise the default 404 page so it can be handled by sites that link
+#directly to images.
+- url: /(.*\.(gif|png|jpg|ico|bmp|css|otf|eot|svg|ttf|woff))
+  static_files: static_website/\1
+  upload: static_website/(.*\.(gif|png|jpg|ico|bmp|css|otf|eot|svg|ttf|woff)) 
+  
+libraries:
+- name: webapp2
+  version: "2.5.2"
