@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="custom.css">
 
 <title>About PubVenn</title>
 </head>
@@ -11,42 +12,57 @@
 <body>
 
 <div class="container">
-  
-<h1>About PubVenn</h1>
-
+<div class="jumbotron">  
+	<h1>About PubVenn</h1>
+	<a id="about" class="label label-default" href="pubvenn.html">Home</a>		
+</div>
    <div class="row">
    
 <div class="col-sm-7 col-md-7 col-lg-7">
-<h2>Why PubVenn?</h2>
-<p>Every time you enter a PubMed search, the friendly computers at the NCBI work to <a href="http://www.nlm.nih.gov/bsd/disted/pubmedtutorial/020_040.html">translate</a> your terms(s) into a carefully codified search.</p>
-
-<p>For example, "death" becomes <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term=%22death%22[MeSH%20Terms]%20OR%20%22death%22[All%20Fields]&cmd=DetailsSearch">"death"[MeSH Terms] OR "death"[All Fields]"</a>, while "heart attacks and aspirin" turns into the slightly more wordy <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term=%28%22myocardial%20infarction%22[MeSH%20Terms]%20OR%20%28%22myocardial%22[All%20Fields]%20AND%20%22infarction%22[All%20Fields]%29%20OR%20%22myocardial%20infarction%22[All%20Fields]%20OR%20%28%22heart%22[All%20Fields]%20AND%20%22attacks%22[All%20Fields]%29%20OR%20%22heart%20attacks%22[All%20Fields]%29%20AND%20%28%22aspirin%22[MeSH%20Terms]%20OR%20%22aspirin%22[All%20Fields]%29&cmd=DetailsSearch">
-("myocardial infarction"[MeSH Terms] OR ("myocardial"[All Fields] AND "infarction"[All Fields]) OR "myocardial infarction"[All Fields] OR ("heart"[All Fields] AND "attacks"[All Fields]) OR "heart attacks"[All Fields]) AND ("aspirin"[MeSH Terms] OR "aspirin"[All Fields])"</a>.
-While it is possible to view this process by peeking in the "search details" box, it can be difficult to visualize just what these terms represent.</p>
-<p>PubVenn takes these disparate terms, and shows how the piles of citations they return relate to one another using the magic of <a href="http://plato.stanford.edu/entries/diagrams/#VenDia">Venn diagrams</a>.</p> 
-
-</div>
-      
+	<div class="panel panel-default">
+	<div class="panel-body">
+		<h2>Why PubVenn?</h2>
+		<p><a href="http://plato.stanford.edu/entries/diagrams/#VenDia">Venn diagrams</a> have been used by librarians for ages to help users visualize how complex searches work. This is particulalrly true with vast bibliographic 
+		databases such as PubMed. In it's default mode, PubVenn takes a complex PubMed search and divides it into its constituent parts. It then searches each part plots those disparate parts and shows the piles of citations they return using a 
+		proportionally-sized venn diagram.</p> 
+		
+		<h3>Expanded Subjects</h3>
+		<p>Every time you enter a PubMed search, the friendly computers at the NCBI work to <a href="http://www.nlm.nih.gov/bsd/disted/pubmedtutorial/020_040.html">translate</a> your terms(s) into a carefully codified search, often combining the words that you typed with a series of <a href="http://www.nlm.nih.gov/pubs/factsheets/mesh.html">Medical Subject Headings (MeSH)</a>. For example, "death" becomes 
+		<a href="http://www.ncbi.nlm.nih.gov/pubmed/?term=%22death%22[MeSH%20Terms]%20OR%20%22death%22[All%20Fields]&cmd=DetailsSearch">"death"[MeSH Terms] OR "death"[All Fields]"</a>, while "heart attacks and aspirin" turns into the slightly more wordy <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term=%28%22myocardial%20infarction%22[MeSH%20Terms]%20OR%20%28%22myocardial%22[All%20Fields]%20AND%20%22infarction%22[All%20Fields]%29%20OR%20%22myocardial%20infarction%22[All%20Fields]%20OR%20%28%22heart%22[All%20Fields]%20AND%20%22attacks%22[All%20Fields]%29%20OR%20%22heart%20attacks%22[All%20Fields]%29%20AND%20%28%22aspirin%22[MeSH%20Terms]%20OR%20%22aspirin%22[All%20Fields]%29&cmd=DetailsSearch">
+		("myocardial infarction"[MeSH Terms] OR ("myocardial"[All Fields] AND "infarction"[All Fields]) OR "myocardial infarction"[All Fields] OR ("heart"[All Fields] AND "attacks"[All Fields]) OR "heart attacks"[All Fields]) AND ("aspirin"[MeSH Terms] OR "aspirin"[All Fields])"</a>.
+		While it is possible to view this process on PubMed iteslf by peeking in the "search details" box, it can be difficult to visualize just what these terms represent. Detailed mode makes this process explicit.</p>
+		
+		<h3>Limitations</h3>
+		<p>Please note that the information provided here comes ultimately from the <a href="http://www.ncbi.nlm.nih.gov/">National Center for Biotechnology Information</a> and is subject to the terms listed under their 
+		<a href="http://www.ncbi.nlm.nih.gov/About/disclaimer.html">Disclaimer and Copyright notice</a>. While PubVenn will almost always give a good sense of set proportions, plotting intersections onto a two-dimensional plane can be somewhat inexact for any diagram involving more than two sets. 
+		If you have any problems, comments or enhancement requests, please contact Ed Sperr at <a href="mailto:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a>.</p>
+		
+	</div>
+	</div>
+</div>     
       
      <div class="col-sm-5 col-md-5 col-lg-5">
  <div class="panel panel-default">    
 <div class="panel-body">
 <h2>Contact</h2>
 <p>PubVenn is a experimental project of Ed Sperr, M.L.I.S.</p>
-<p>Ed can be reached at <a href="maito:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a>
+<p>Ed can be reached at <a href="mailto:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a>.</p>
       </div>
    </div>
    </div>
-</div>
+
    
-<div class="row">  
-<div class="col-sm-6 col-md-6 col-lg-6">
-<h2>Technologies</h2>
-<p>PubVenn is built with love, a heap of JavaScript and just a smidgen of jQuery. It utuilizes NCBI's <a href="http://www.ncbi.nlm.nih.gov/books/NBK25501/">Entrez Programming Utilities</a> for searching PubMed and Ben Fredrickson's <a href="https://github.com/benfred/venn.js/tree/master">
-venn.js</a> to perform the set visualization (with an assist from Andrea Leofreddi's <a href="https://github.com/ariutta/svg-pan-zoom">svg-pan-zoom</a>).</p>
+<div class="col-sm-5 col-md-5 col-lg-5">
+	<div class="panel panel-default">
+	<div class="panel-body">
+		<h2>Technologies</h2>
+		<p>PubVenn is built with love, a heap of JavaScript and just a smidgen of <a href="http://jquery.com/">jQuery</a>. It utuilizes NCBI's <a href="http://www.ncbi.nlm.nih.gov/books/NBK25501/">Entrez Programming Utilities</a> for searching 
+		PubMed and Ben Fredrickson's <a href="https://github.com/benfred/venn.js/tree/master">venn.js</a> overlay of Mike Bostock's <a href="http://d3js.org/">d3.js</a> to perform the set visualization. Responsive layout made easier with <a href="http://getbootstrap.com/">Bootstrap</a>.</p>
+	</div>
+	</div>
+      
       </div>
-</div>
    
-   
+</div>   
 </div>
 </body>
