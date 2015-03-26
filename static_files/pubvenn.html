@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="custom.css">
+<link rel="stylesheet" href="/css/custom.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="http://d3js.org/d3.v2.js"></script>
+<script src="http://d3js.org/d3.v3.js"></script>
 <script src="venn.js"></script>
 <script src="numeric-1.2.6.min.js"></script>
 <script src="mds.js"></script>
+<script src="canvg.js"></script>
+<script src="rgbcolor.js"></script>
 <title>PubVenn: Visual PubMed Search</title>
 
 </head> 
@@ -17,13 +19,13 @@
 
 <div class="container">
       <div class="jumbotron">
-        <h1>PubVenn</h1>      
-        <p>Explore your PubMed search with Venn diagrams!</p> 
+        <!--<img src="logo.png">-->
+	<h1 id="logo"><span id="pub">Pub</span><span id="venn">Venn</span></h1>
         <a id="about" class="label label-default" href="about.html">About PubVenn</a>		
       </div>
 
 <div class="row">
-	<div class="col-sm-7 col-md-7 col-lg-7">
+	<div class="col-sm-6 col-md-7 col-lg-8">
 	
 		<div class="input-group input-group-lg">
 			<input type="text" id="search" class="form-control">
@@ -32,11 +34,12 @@
 			</span>
 			
 		</div>
+		          <div class="clearfix">
 			<div class="detailed">
-				<label for="detailed">Detailed view</label>
+				<label for="detailed">Expanded subjects</label>
 				<input id="detailed" type="checkbox">
 			</div>
-
+                               </div>
 
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -44,7 +47,7 @@
 			</div>
 			<div class="panel-body">
 				<div class="venn">
-					<p class="vennMsg">Enter your PubMed search above</p>
+					<p class="vennMsg">Explore PubMed using venn diagrams.<br /> Enter your search above</p>
 				</div> 
 				<div class="hidden_diagram "></div>				
 
@@ -62,7 +65,7 @@
 		</div>
 	</div>
 
-	<div class="col-sm-5 col-md-5 col-lg-5">
+	<div class="col-sm-6 col-md-5 col-lg-4">
 		<div class="panel panel-default">
 			<div id="vennresults">
 			<div class="panel-heading">
@@ -112,8 +115,12 @@ var searchCount = 0;
     startSearch(searchstr);
     });
 
-   $( ".venn" ).on( "click", "#getDLimage", function() {
-	getDLimage();
+   $( ".venn" ).on( "click", "#getSVGimage", function() {
+	getSVGimage();
+    });
+    
+   $( ".venn" ).on( "click", "#getCanvasimage", function() {
+	getCanvasimage();
     });
 
 function vennresults (d) {
@@ -299,7 +306,7 @@ function startSearch(term) {
 		}		
 		if (possibleTerms<2) {
 			$(".venn").empty();
-			$(".venn").append('<p class="vennMsg">Only one valid term entered. Enter more terms or choose "detailed" to show venn diagram.</p>');
+			$(".venn").append('<p class="vennMsg">Only one valid term entered. Enter more terms or choose "expanded subjects"</p>');
 		} else {
 			getSimpleSets(termsarray, possibleTerms);			
 		}
@@ -321,6 +328,8 @@ function startSearch(term) {
 
 function drawVennDiagram () {
 $(".venn").empty();
+var currentwidth = $(".venn").innerWidth();
+console.log(currentwidth);
 
 var zoom = d3.behavior.zoom()
     .translate([0, 0])
@@ -329,16 +338,19 @@ var zoom = d3.behavior.zoom()
     .on("zoom", zoomed);
     
 var chart = venn.VennDiagram()
-                 .width(500)
-                 .height(500);
+                 .width(currentwidth)
+                 .height(currentwidth)
 		 //include this for MD5 layout -- supposedly better, but some weird (broken) edge cases...
-		// .layoutFunction(
-                 //   function(d) { return venn.venn(d, { initialLayout: venn.classicMDSLayout });}
-                //);
+		.layoutFunction(
+                    function(d) { return venn.venn(d, { initialLayout: venn.classicMDSLayout });}
+                );
 
 var div = d3.select(".venn")
 div.datum(sets).call(chart);
 
+var fixtext = d3.selectAll("text")
+         .attr("font-size","1.25em");	
+	 
 var svg = d3.select("svg").call(zoom);
 
 var tooltip = d3.select("body").append("div")
@@ -384,26 +396,21 @@ div.selectAll("g")
         //console.log(JSON.stringify(d));
         vennresults(d);      
     });
-  
+
+
 function zoomed() {
   svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 }
 
-//set ourselves a handle for the SVG diagram and make it responsive instead of fixed
-var setid = d3.select("svg").attr("id","venn")   
-			.attr("width", null)
-                	.attr("height", null)
-			.attr("viewBox", "0 0 500 500")
-			.attr("preserveAspectRatio", "xMinYMin meet")
-			.attr("class", "svg-content");
-
+var setid = d3.select("svg").attr("id","venn");
 
 $( ".diaginfo" ).removeClass( "hideMe" ); 
-$(".venn").append('<a id="getDLimage" href="#">View/Download image</a>');
+
+$(".venn").append('<p>View/Download <a id="getSVGimage" href="#">SVG</a> | <a id="getCanvasimage" href="#">PNG</a></p>');
 }
 
-function getDLimage () {
-    //The new API kills things when you sraw it a second time, so for the time being, we just grab the original diagram
+function getSVGimage () {
+    //The new API kills things when you draw it a second time, so for the time being, we just grab the original diagram
     //$(".hidden_diagram").empty();
     //var brandstr = 'PubMed citation sets for  "' + searchstr + '"';
     
@@ -419,49 +426,40 @@ function getDLimage () {
 	.attr("y", "20");
      */	
      	
-    //use d3 to grab our new diagram and pass it through the serializer -- then create a data_uri
-    //var xmlString = (new XMLSerializer).serializeToString(d3.select('.hidden_diagram svg')); 
-     //var svg = $('.hidden_diagram').find('svg')[0];  
-     var svg = document.getElementById('venn');     
-     var xmlString = (new XMLSerializer).serializeToString(svg);      
-     var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);   
-    
-    //we could just pass the string to a data_uri and open a new window   
+    //use d3 to grab our new diagram and pass it through the serializer -- then create a data_uri (or you could just do document.getElementsByTagName("svg")[0];) 
+     
+     var xml = d3.select("svg")
+	.attr("title", "test2")
+	.attr("version", 1.1)
+	.attr("xmlns", "http://www.w3.org/2000/svg").node();
+	
+     var fixtext = d3.selectAll("text")
+         .attr("font-family","sans-serif");	
+
+    var xmlString = (new XMLSerializer).serializeToString(xml);      
+    var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);   
+    // or "data:image/svg+xml," + encodeURIComponent(xmlString));
     window.open(data_uri);
-    
-    //...or we could try using a html5 canvas here to convert it to a PNG and make saving it more obvious
-    //TEST on Safari and Chrome
-    /*
-    var image = new Image;
-    image.src = data_uri;
-    image.onload = function(e) {
-    
-        var canvas = document.createElement("canvas");
-        canvas.width = image.width;
-        canvas.height = image.height;
+    }
+        //implicitly call a data_uri -- maybe safari will like it better?
+	//
+//another canvas attempt
 
-        var context = canvas.getContext("2d");
-        context.clearRect(0, 0, image.width, image.height);
-        context.drawImage(image, 0, 0);
+function getCanvasimage () {
+     var xml = d3.select("svg")
+	.attr("title", "test2")
+	.attr("version", 1.1)
+	.attr("xmlns", "http://www.w3.org/2000/svg").node();
 
-        var a = document.createElement("a");
-        a.download = "file.png";
-        a.href = canvas.toDataURL("image/png");
-	window.open(a.href);
+    var xmlString = (new XMLSerializer).serializeToString(xml);     
+    var canvas = document.createElement("canvas");
+    canvas.width = 700;
+    canvas.height = 700;
+    var context = canvas.getContext("2d");
+    context.clearRect(0, 0, 700, 700);
 
-        //$(".venn .panel-footer").append('<a href="' + a.href + '">View/Save Image</a>');
-	}
-  	*/
-
-  
-//myCanvas = document.createElement('canvas');    
-//var ctx = myCanvas.getContext('2d');
-//var img = new Image;
-//give the source *after* we call our onload function?
-//img.onload = function(){ ctx.drawImage(img,0,0); };
-//img.src = "data:image/svg+xml;base64,"+btoa(xmlString);    
-        
-
+    canvg(canvas, xmlString, { ignoreAnimation: true });
+    document.location.href = canvas.toDataURL(); 
 }
 
 })
