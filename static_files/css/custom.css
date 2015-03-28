@@ -86,16 +86,15 @@ cursor: pointer;
 .clearfix {
 	overflow: hidden;
 }
-
-#logo {
-	font-family: "Century Gothic", Helvetica, sans-serif;
-	}
-#pub { 
+	
+#logopub { 
 	color: #CAE7CA;
 	z-index:1;
+	font-family: "Century Gothic", Helvetica, sans-serif;
 	}	
 	
-#venn { 
+#logovenn { 
+	font-family: "Century Gothic", Helvetica, sans-serif;
 	position: relative;
 	top: .4em;
 	left: -.4em;
