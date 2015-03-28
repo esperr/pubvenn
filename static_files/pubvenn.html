@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="custom.css">
+<link rel="stylesheet" href="/css/custom.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="http://d3js.org/d3.v3.js"></script>
 <script src="venn.js"></script>
@@ -307,7 +307,7 @@ function startSearch(term) {
 	}
     searchCount++;
 
-     $( ".venn" ).append("<div class='vennMsg'><p>Loading your diagram. Please wait...</p><img src='loading-bars.svg'></div> ")
+     $( ".venn" ).append("<div class='vennMsg'><p>Loading your diagram. Please wait...</p><img src='/images/loading-bars.svg'></div> ")
      esearch(term)
      .then(function( data ) {
 	getDocs(data);
