@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="/css/custom.css">
+<link rel="stylesheet" href="custom.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="http://d3js.org/d3.v3.js"></script>
 <script src="venn.js"></script>
@@ -20,7 +20,7 @@
 <div class="container">
       <div class="jumbotron">
         <!--<img src="logo.png">-->
-	<h1 id="logo"><span id="pub">Pub</span><span id="venn">Venn</span></h1>
+	<h1><span id="logopub">Pub</span><span id="logovenn">Venn</span></h1>
         <a id="about" class="label label-default" href="about.html">About PubVenn</a>		
       </div>
 
@@ -47,7 +47,10 @@
 			</div>
 			<div class="panel-body">
 				<div class="venn">
-					<p class="vennMsg">Explore PubMed using venn diagrams.<br /> Enter your search above</p>
+					<p>PubVenn enables you to explore PubMed using venn diagrams. Enter any multi-term search above to see the relative size of the citation set for each term as well as how those sets interact.</p> 
+					<p>For example, you can try simple searches such as <span class="pastsearch">smoking AND cancer</span> or slightly more complex ones such as <span class="pastsearch">mosquito AND dengue AND caribbean</span>.</p>
+					<p>Use the "expanded subjects" option to see the myriad of terms that PubMed translates your search into before it gets run, as with <span class="pastsearch">cancer [expanded]</span> or <span class="pastsearch">heart disease [expanded]</span>. 
+					Please note that due to the number of terms a search can get mapped to, the sets for expanded subjects can take a few seconds to render.</p>
 				</div> 
 				<div class="hidden_diagram "></div>				
 
@@ -73,7 +76,7 @@
 				</div>
 			</div>
 			<div id="cites" class="panel-body">
-				<dl></dl>
+			          <dl></dl>
 			</div>
 			<div class="panel-footer"></div>
 		</div>
@@ -108,11 +111,21 @@ var searchCount = 0;
      searchstr = $("#search").val(); 
      startSearch(searchstr); 
    });
+   
+  $(".pastsearch").click(function(){
+    var searchstr = $( this ).html();
+     pastsearches(searchstr); 
+   });
 
    //We have to use event delegation to select the things added after page load...
    $( "#past" ).on( "click", ".pastsearch", function() {
     var searchstr = $( this ).html();
-    startSearch(searchstr);
+    pastsearches(searchstr); 	
+    });
+   
+   $( "#past" ).on( "click", ".pastsearch", function() {
+    var searchstr = $( this ).html();
+    pastsearches(searchstr); 	
     });
 
    $( ".venn" ).on( "click", "#getSVGimage", function() {
@@ -122,6 +135,18 @@ var searchCount = 0;
    $( ".venn" ).on( "click", "#getCanvasimage", function() {
 	getCanvasimage();
     });
+    
+function pastsearches (searchstr) {
+    var re = /\[expanded\]/g;
+    if (re.test(searchstr)) {
+	$( "#detailed" ).prop( "checked", true );
+	searchstr = searchstr.slice(0, -11)
+     } else {
+	$( "#detailed" ).prop( "checked", false );	
+     }
+    $( "#search" ).val( searchstr ); 
+    startSearch(searchstr);
+}
 
 function vennresults (d) {
      if (d.sets.length > 1) {
@@ -277,6 +302,9 @@ function startSearch(term) {
     if (searchCount>0) { $( "#past" ).removeClass( "hideMe" ); }
     $( "#past dt" ).last().removeClass( "hideMe" );
     $("#past dl").append('<dt class="pastsearch hideMe">' + term + "</dt>");
+    if (detailed.checked) {
+		$( "#past dt" ).last().append( " [expanded]" );
+	}
     searchCount++;
 
      $( ".venn" ).append("<div class='vennMsg'><p>Loading your diagram. Please wait...</p><img src='loading-bars.svg'></div> ")
