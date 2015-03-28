@@ -71,3 +71,33 @@ cursor: pointer;
 #about:hover, #about:focus {
 	background-color: rgb(202,220,237);
 }
+
+.detailed {
+	background-color: #FFF;	
+	padding-left: 1em;
+	border: 2px solid #CCC;
+	max-width: 25%;
+	min-width: 15em;
+	margin-top: 0.2em;
+	margin-bottom: 0.2em;
+	float: right;
+}
+
+.clearfix {
+	overflow: hidden;
+}
+
+#logo {
+	font-family: "Century Gothic", Helvetica, sans-serif;
+	}
+#pub { 
+	color: #CAE7CA;
+	z-index:1;
+	}	
+	
+#venn { 
+	position: relative;
+	top: .4em;
+	left: -.4em;
+	z-index:2; 
+	}		
