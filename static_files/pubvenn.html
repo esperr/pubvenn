@@ -59,7 +59,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 				<div class="venn">
 					<p>PubVenn enables you to explore PubMed using venn diagrams. Enter any multi-term search above to see the relative size of the citation set for each term as well as how those sets interact.</p>
 					<p>For example, you can try simple searches such as <span class="pastsearch">smoking AND cancer</span> or slightly more complex ones such as <span class="pastsearch">mosquito AND dengue AND caribbean</span>.</p>
-          <p><em>Note</em>: You can now use parantheses to group terms together in a search -- for example, <span class="pastsearch">depression AND (euthanasia OR assisted suicide)</span>.</p> 
+          <p><em>Note</em>: You can now use parantheses to group terms together in a search -- for example, <span class="pastsearch">depression AND (euthanasia OR assisted suicide)</span></p>
           <p>Use the "expanded subjects" option to see the myriad of terms that PubMed translates your search into before it gets run, as with <span class="pastsearch">cancer [expanded]</span> or <span class="pastsearch">heart disease [expanded]</span>.
 					Please note that due to the number of terms a search can get mapped to, the sets for expanded subjects can take a few seconds to render.</p>
 				</div>
@@ -201,20 +201,40 @@ function esearch(term) {
      });
 }
 
+function buildOLCounts(search) {
+  $.ajax({
+	url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
+	data: {
+	db: 'pubmed',
+	usehistory: 'y',
+	term: search.terms,
+	retmode: 'json',
+	retmax: 0,
+	email: 'ed_sperr@hotmail.com',
+	tool: 'pubvenn'
+  },
+  success: function( data ) {
+	   myOverlap = new setOverlapSet(search.sets,data.esearchresult.count);
+	   sets.push(myOverlap);
+     if (!searches.length) {
+       drawVennDiagram ();
+     }
+  }
+     });
+}
+
 function getOLCounts() {
 	//We do it this way instaed of a loop so we can easily throttle the count requests with setTimeout
 	//console.log("Searches: " + JSON.stringify(searches));
 	mysearch = searches.pop();
-	esearch(mysearch.terms)
-	.then(function( data ) {
-	myOverlap = new setOverlapSet(mysearch.sets,data.esearchresult.count);
-	sets.push(myOverlap);
+  console.log(mysearch);
+	buildOLCounts(mysearch);
+
 	if (searches.length) {
 		setTimeout(getOLCounts, 300);
 	} else {
-		drawVennDiagram ();
+    return;
 		}
-	});
 }
 
 function getOverlaps() {
