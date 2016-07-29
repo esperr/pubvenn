@@ -1,16 +1,16 @@
 body {
-		background-color: #f7f3e8; 
+		background-color: #f7f3e8;
 	}
 .jumbotron {
 color: white;
-background-color: rgb(70,131,193);	
+background-color: rgb(70,131,193);
 }
 
 .btn-default {
 	background-color: rgb(41,82,124);
 	color: white;
 	}
-	
+
 .venntooltip {
   position: absolute;
   text-align: center;
@@ -47,7 +47,7 @@ text-align: center
     bottom: 1em;
     color:gray;
     right: 3em;
-} 
+}
 
 .zoom {
    float: right;
@@ -73,7 +73,7 @@ cursor: pointer;
 }
 
 .detailed {
-	background-color: #FFF;	
+	background-color: #FFF;
 	padding-left: 1em;
 	border: 2px solid #CCC;
 	max-width: 25%;
@@ -86,17 +86,53 @@ cursor: pointer;
 .clearfix {
 	overflow: hidden;
 }
-	
-#logopub { 
+
+#logopub {
 	color: #CAE7CA;
 	z-index:1;
 	font-family: "Century Gothic", Helvetica, sans-serif;
-	}	
-	
-#logovenn { 
+	}
+
+#logovenn {
 	font-family: "Century Gothic", Helvetica, sans-serif;
 	position: relative;
 	top: .4em;
 	left: -.4em;
-	z-index:2; 
-	}		
+	z-index:2;
+	}
+
+	#printable {
+	  display: none; /* Hidden by default */
+	  position: fixed; /* Stay in place */
+	  z-index: 3; /* Sit on top */
+	  padding-top: 100px; /* Location of the box */
+	  left: 0;
+	  top: 0;
+	  width: 100%; /* Full width */
+	  height: 100%; /* Full height */
+	  overflow: auto; /* Enable scroll if needed */
+	  background-color: rgb(0,0,0); /* Fallback color */
+	  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+	}
+
+	#printable-stuff {
+	  background-color: #fefefe;
+	  margin: auto;
+	  padding: 20px;
+	  border: 1px solid #888;
+	  width: 80%;
+	}
+
+	.close {
+	  color: #aaaaaa;
+	  float: right;
+	  font-size: 28px;
+	  font-weight: bold;
+	}
+
+	.close:hover,
+	.close:focus {
+	  color: #000;
+	  text-decoration: none;
+	  cursor: pointer;
+	}

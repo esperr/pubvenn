@@ -10,8 +10,11 @@
 <script src="venn.js"></script>
 <!--<script src="numeric-1.2.6.min.js"></script>
 <script src="mds.js"></script>-->
-<script src="canvg.js"></script>
-<script src="rgbcolor.js"></script>
+<!--<script src="canvg.js"></script>
+<script src="rgbcolor.js"></script>-->
+<script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script>
+<script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
+<script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script>
 <title>PubVenn: Visual PubMed Search</title>
 
 </head>
@@ -64,7 +67,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 					Please note that due to the number of terms a search can get mapped to, the sets for expanded subjects can take a few seconds to render.</p>
 				</div>
 				<div class="hidden_diagram "></div>
-
+        <div id="printable">
+          <div id="printable-stuff">
+          <span class="close">×</span>
+          <!--<canvas id="myCanvas2" width="700" height="700">
+            Your browser does not support the HTML5 canvas tag.</canvas>-->
+          </div>
+        </div>
 			</div>
 			<div class="diaginfo panel-footer hideMe">Select an area or intersection on the venn diagram to see citations from that part.</div>
 			</div>
@@ -484,6 +493,8 @@ var setid = d3.select("svg").attr("id","venn");
 $( ".diaginfo" ).removeClass( "hideMe" );
 
 $(".venn").append('<p>View/Download <a id="getSVGimage" href="#">SVG</a> | <a id="getCanvasimage" href="#">PNG</a></p>');
+$( ".venn" ).append('<p><a href="#!" class="printMe">Printable version</a></p>');
+
 }
 
 function getSVGimage () {
@@ -535,6 +546,32 @@ function getCanvasimage () {
     canvg(canvas, xmlString, { ignoreAnimation: true });
     document.location.href = canvas.toDataURL();
 }
+
+
+//Printable modal stuff
+$( ".venn" ).on( "click", ".printMe", function() {
+    var styletext = d3.selectAll("text").style("font-family", "sans-serif");
+    var xml = d3.select("svg")
+      .attr("title", "test2")
+      .attr("version", 1.1)
+      .attr("xmlns", "http://www.w3.org/2000/svg").node();
+    var xmlString = (new XMLSerializer).serializeToString(xml);
+    //canvg(document.getElementById('myCanvas2'), xmlString, { ignoreAnimation: true });
+    var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
+    $( "#printable-stuff" ).append('<img src="' + data_uri + '">');
+    $("#printable").css("display", "block");
+    });
+
+$(".close").click(function(){
+  $("#printable").css("display", "none");
+      });
+
+$(document).click(function(event) {
+   var closeit = document.getElementById('printable');
+   if (event.target == closeit) {
+      $("#printable").css("display", "none");
+      }
+      });
 
 })
 ();
