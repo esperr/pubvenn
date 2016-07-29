@@ -12,9 +12,9 @@
 <script src="mds.js"></script>-->
 <!--<script src="canvg.js"></script>
 <script src="rgbcolor.js"></script>-->
-<script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script>
+<!--<script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script>
 <script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
-<script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script>
+<script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script>-->
 <title>PubVenn: Visual PubMed Search</title>
 
 </head>
@@ -492,7 +492,7 @@ var setid = d3.select("svg").attr("id","venn");
 
 $( ".diaginfo" ).removeClass( "hideMe" );
 
-$(".venn").append('<p>View/Download <a id="getSVGimage" href="#">SVG</a> | <a id="getCanvasimage" href="#">PNG</a></p>');
+//$(".venn").append('<p>View/Download <a id="getSVGimage" href="#">SVG</a> | <a id="getCanvasimage" href="#">PNG</a></p>');
 $( ".venn" ).append('<p><a href="#!" class="printMe">Printable version</a></p>');
 
 }
@@ -550,6 +550,7 @@ function getCanvasimage () {
 
 //Printable modal stuff
 $( ".venn" ).on( "click", ".printMe", function() {
+    $( "#printable img" ).remove();
     var styletext = d3.selectAll("text").style("font-family", "sans-serif");
     var xml = d3.select("svg")
       .attr("title", "test2")
