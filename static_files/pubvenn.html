@@ -3,7 +3,9 @@
  <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">-->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
 <link rel="stylesheet" href="/css/custom.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="http://d3js.org/d3.v3.js"></script>
@@ -227,6 +229,7 @@ function buildOLCounts(search) {
 	   sets.push(myOverlap);
      if (!searches.length) {
        drawVennDiagram ();
+       //drawPrintable ();
      }
   }
      });
@@ -497,67 +500,56 @@ $( ".venn" ).append('<p><a href="#!" class="printMe">Printable version</a></p>')
 
 }
 
-function getSVGimage () {
-    //The new API kills things when you draw it a second time, so for the time being, we just grab the original diagram
-    //$(".hidden_diagram").empty();
-    //var brandstr = 'PubMed citation sets for  "' + searchstr + '"';
-
-    /*
-    var fixtext = d3.selectAll("text")
-       .attr("font-family","sans-serif");
-
-    var brandme = d3.select('.hidden_diagram svg')
-         .attr("id","hidden_one")
-        .append("text")
-	.text(brandstr)
-        .attr("x", "20")
-	.attr("y", "20");
-     */
-
-    //use d3 to grab our new diagram and pass it through the serializer -- then create a data_uri (or you could just do document.getElementsByTagName("svg")[0];)
-
-     var xml = d3.select("svg")
-	.attr("title", "test2")
-	.attr("version", 1.1)
-	.attr("xmlns", "http://www.w3.org/2000/svg").node();
-
-     var fixtext = d3.selectAll("text")
-         .attr("font-family","sans-serif");
-
-    var xmlString = (new XMLSerializer).serializeToString(xml);
-    var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
-    // or "data:image/svg+xml," + encodeURIComponent(xmlString));
-    window.open(data_uri);
-    }
-
-function getCanvasimage () {
-     var xml = d3.select("svg")
-	.attr("title", "test2")
-	.attr("version", 1.1)
-	.attr("xmlns", "http://www.w3.org/2000/svg").node();
-
-    var xmlString = (new XMLSerializer).serializeToString(xml);
-    var canvas = document.createElement("canvas");
-    canvas.width = 700;
-    canvas.height = 700;
-    var context = canvas.getContext("2d");
-    context.clearRect(0, 0, 700, 700);
-
-    canvg(canvas, xmlString, { ignoreAnimation: true });
-    document.location.href = canvas.toDataURL();
-}
-
 
 //Printable modal stuff
 $( ".venn" ).on( "click", ".printMe", function() {
+
     $( "#printable img" ).remove();
-    var styletext = d3.selectAll("text").style("font-family", "sans-serif");
-    var xml = d3.select("svg")
+    $( "#printvenn" ).remove();
+
+    var itm = document.getElementById("venn");
+    var cln = itm.cloneNode(true);
+    cln.setAttribute("id", "printvenn");
+    cln.setAttribute("height", "720");
+    cln.setAttribute("width", "700");
+
+    var shiftchildren = cln.childNodes;
+    for (i = 0; i < shiftchildren.length; i++) {
+      shiftchildren[i].setAttribute("transform","translate(25,45) scale(.90)");
+      console.log(shiftchildren[i]);
+    }
+
+    var node = document.createElement("div");
+    node.setAttribute("style", "display: none;");
+    node.setAttribute("id", "hiddendiv");
+    node.appendChild(cln);
+    document.body.appendChild(node);
+
+    var titletext = $( "#past dt" ).last().text();
+    console.log(titletext);
+
+    var writecredit = d3.select("#printvenn").append("text")
+      .text("Made with PubVenn: http://pubvenn.appspot.com/")
+      .attr("font-size",".9em")
+      .attr("x","25")
+      .attr("y","700");
+
+    var styletext = d3.select("#printvenn").selectAll("text").style("font-family", "sans-serif");
+
+    var writetitle = d3.select("#printvenn").append("text")
+      .text(titletext)
+      .style("font-family", "Century Gothic, Helvetica, sans-serif")
+      .attr("font-size","2em")
+      .attr("id","printable-title")
+      .attr("x","20")
+      .attr("y","45");
+
+    var xml = d3.select("#printvenn")
       .attr("title", "test2")
       .attr("version", 1.1)
       .attr("xmlns", "http://www.w3.org/2000/svg").node();
+
     var xmlString = (new XMLSerializer).serializeToString(xml);
-    //canvg(document.getElementById('myCanvas2'), xmlString, { ignoreAnimation: true });
     var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
     $( "#printable-stuff" ).append('<img src="' + data_uri + '">');
     $("#printable").css("display", "block");
