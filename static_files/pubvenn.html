@@ -12,11 +12,6 @@
 <script src="venn.js"></script>
 <!--<script src="numeric-1.2.6.min.js"></script>
 <script src="mds.js"></script>-->
-<!--<script src="canvg.js"></script>
-<script src="rgbcolor.js"></script>-->
-<!--<script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script>
-<script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
-<script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script>-->
 <title>PubVenn: Visual PubMed Search</title>
 
 </head>
@@ -68,7 +63,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <p>Use the "expanded subjects" option to see the myriad of terms that PubMed translates your search into before it gets run, as with <span class="pastsearch">cancer [expanded]</span> or <span class="pastsearch">heart disease [expanded]</span>.
 					Please note that due to the number of terms a search can get mapped to, the sets for expanded subjects can take a few seconds to render.</p>
 				</div>
-				<div class="hidden_diagram "></div>
         <div id="printable">
           <div id="printable-stuff">
           <span class="close">×</span>
@@ -526,7 +520,9 @@ $( ".venn" ).on( "click", ".printMe", function() {
     document.body.appendChild(node);
 
     var titletext = $( "#past dt" ).last().text();
-    console.log(titletext);
+    if (titletext.length > 40) {
+      var multiline = 1;
+    }
 
     var writecredit = d3.select("#printvenn").append("text")
       .text("Made with PubVenn: http://pubvenn.appspot.com/")
@@ -536,13 +532,33 @@ $( ".venn" ).on( "click", ".printMe", function() {
 
     var styletext = d3.select("#printvenn").selectAll("text").style("font-family", "sans-serif");
 
-    var writetitle = d3.select("#printvenn").append("text")
-      .text(titletext)
-      .style("font-family", "Century Gothic, Helvetica, sans-serif")
-      .attr("font-size","2em")
-      .attr("id","printable-title")
-      .attr("x","20")
-      .attr("y","45");
+    if (!multiline) {
+      var writetitle = d3.select("#printvenn").append("text")
+        .text(titletext)
+        .attr("font-size","2em")
+        .attr("class","printable-title")
+        .attr("x","20")
+        .attr("y","45");
+    } else {
+        titletext = titletext.split(" ");
+        var titlepart1 = titletext.slice(0, 7).join(" ");
+        var titlepart2 = titletext.slice(7).join(" ");
+        var writetitle = d3.select("#printvenn").append("text")
+          .text(titlepart1)
+          .attr("font-size","1.5em")
+          .attr("class","printable-title")
+          .attr("x","20")
+          .attr("y","30");
+        var writetitle2 = d3.select("#printvenn").append("text")
+          .text(titlepart2)
+          .attr("font-size","1.5em")
+          .attr("class","printable-title")
+          .attr("x","20")
+          .attr("y","55");
+        }
+
+    var styletitle = d3.selectAll(".printable-title")
+      .style("font-family", "Century Gothic, Helvetica, sans-serif");
 
     var xml = d3.select("#printvenn")
       .attr("title", "test2")
