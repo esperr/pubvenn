@@ -104,6 +104,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <!--</div>-->
 
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">  <p>Design and contruction by Ed Sperr, M.L.I.S. (<a href="mailto:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a>)   |
+          Data from <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>  |  Visualization done with <a href="https://github.com/benfred/venn.js/tree/master">venn.js</a> and <a href="http://d3js.org/">d3.js</a>
+         | See the code at <a href="https://github.com/esperr/pubvenn">GitHub</a></p></span>
+      </div>
+    </footer>
+
 <script>
 
 
@@ -231,9 +239,7 @@ function buildOLCounts(search) {
 
 function getOLCounts() {
 	//We do it this way instaed of a loop so we can easily throttle the count requests with setTimeout
-	//console.log("Searches: " + JSON.stringify(searches));
 	mysearch = searches.pop();
-  console.log(mysearch);
 	buildOLCounts(mysearch);
 
 	if (searches.length) {
@@ -332,11 +338,13 @@ function startSearch(term) {
     while (overlaps.length) { overlaps.pop(); }
 
     if (searchCount>0) { $( "#past" ).removeClass( "hideMe" ); }
+    var pastText = term;
+    if (detailed.checked) {
+      pastText = term + " [expanded] ";
+    }
     $( "#past dt" ).last().removeClass( "hideMe" );
     $("#past dl").append('<dt class="pastsearch hideMe">' + term + "</dt>");
-    if (detailed.checked) {
-		$( "#past dt" ).last().append( " [expanded]" );
-	}
+
     searchCount++;
 
      $( ".venn" ).append("<div class='vennMsg'><p>Loading your diagram. Please wait...</p><img src='/images/loading-bars.svg'></div> ")
@@ -364,14 +372,12 @@ function startSearch(term) {
     while ((term.lastIndexOf("(")) > -1) {
       var n = term.lastIndexOf("(");
       for(var i=n; i < term.length; i++){
-        //console.log(term);
       	if(term.charAt(i) == ')'){
-          parenTerm = term.substring(n+1,i);
+          parenTerm = term.substring(n,i+1);
         	termsarray.push(parenTerm);
           termPartone = term.substring(0,n);
           termParttwo = term.substring(i+1);
           term = termPartone + termParttwo;
-          console.log(term);
         }
       }
     }
@@ -411,7 +417,6 @@ function startSearch(term) {
 function drawVennDiagram () {
 $(".venn").empty();
 var currentwidth = $(".venn").innerWidth();
-console.log(currentwidth);
 
 //Native zoom for d3 doesn't quite work yet...
 /*var zoom = d3.behavior.zoom()
@@ -476,7 +481,6 @@ div.selectAll("g")
     })
 
      .on("click", function(d, i) {
-        //console.log(JSON.stringify(d));
         vennresults(d);
     });
 
@@ -510,7 +514,6 @@ $( ".venn" ).on( "click", ".printMe", function() {
     var shiftchildren = cln.childNodes;
     for (i = 0; i < shiftchildren.length; i++) {
       shiftchildren[i].setAttribute("transform","translate(25,45) scale(.90)");
-      console.log(shiftchildren[i]);
     }
 
     var node = document.createElement("div");

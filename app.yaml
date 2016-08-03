@@ -8,26 +8,26 @@ handlers:
 - url: /
   static_files: static_files/pubvenn.html
   upload: static_files/index.html
-  
+  secure: never
+
 - url: /(.*\.html)
   mime_type: text/html
   static_files: static_files/\1
   upload: static_files/(.*\.html)
   expiration: "1h"
-  
+
 - url: /(.*\.js)
   mime_type: text/javascript
   static_files: static_files/\1
   upload: static_files/(.*\.js)
-  
+
 - url: /css
   static_dir: static_files/css
-  
+
 - url: /images
   static_dir: static_files/images
-  
 
-  
+
 libraries:
 - name: webapp2
   version: "2.5.2"
