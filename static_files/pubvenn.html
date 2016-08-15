@@ -241,7 +241,8 @@ function getOLCounts() {
 	//We do it this way instaed of a loop so we can easily throttle the count requests with setTimeout
 	mysearch = searches.pop();
 	buildOLCounts(mysearch);
-
+  var progressProportion = 1/searches.length;
+  $("progress").attr("value", progressProportion*100);
 	if (searches.length) {
 		setTimeout(getOLCounts, 300);
 	} else {
@@ -347,7 +348,7 @@ function startSearch(term) {
 
     searchCount++;
 
-     $( ".venn" ).append("<div class='vennMsg'><p>Loading your diagram. Please wait...</p><img src='/images/loading-bars.svg'></div> ")
+     $( ".venn" ).append('<div class="vennMsg"><p>Loading your diagram. Please wait...</p><progress id="fetchresults" value="1" max="100"></progress></div> ');
      esearch(term)
      .then(function( data ) {
 	getDocs(data);
