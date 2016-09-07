@@ -8,7 +8,7 @@ handlers:
 - url: /
   static_files: static_files/pubvenn.html
   upload: static_files/index.html
-  secure: never
+  secure: always
 
 - url: /(.*\.html)
   mime_type: text/html
