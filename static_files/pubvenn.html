@@ -494,7 +494,6 @@ var setid = d3.select("svg").attr("id","venn");
 
 $( ".diaginfo" ).removeClass( "hideMe" );
 
-//$(".venn").append('<p>View/Download <a id="getSVGimage" href="#">SVG</a> | <a id="getCanvasimage" href="#">PNG</a></p>');
 $( ".venn" ).append('<p><a href="#!" class="printMe">Printable version</a></p>');
 
 }
@@ -503,18 +502,34 @@ $( ".venn" ).append('<p><a href="#!" class="printMe">Printable version</a></p>')
 //Printable modal stuff
 $( ".venn" ).on( "click", ".printMe", function() {
 
+    var titletext = $( "#past dt" ).last().text();
+    var titleparts = [];
+    titletext = titletext.split(" ");
+
+    while (titletext.length) {
+      var partText = [];
+      for (i = 0; i < 6; i++) {
+        partText.push(titletext.shift());
+        if (titletext.length == 0) { break; }
+      }
+      var titlepart = partText.join(" ");
+      titleparts.push(titlepart);
+    }
+
+    var topShift = (titleparts.length*25)+20;
+
     $( "#printable img" ).remove();
     $( "#printvenn" ).remove();
 
     var itm = document.getElementById("venn");
     var cln = itm.cloneNode(true);
     cln.setAttribute("id", "printvenn");
-    cln.setAttribute("height", "720");
+    cln.setAttribute("height", topShift+700);
     cln.setAttribute("width", "700");
 
     var shiftchildren = cln.childNodes;
     for (i = 0; i < shiftchildren.length; i++) {
-      shiftchildren[i].setAttribute("transform","translate(25,45) scale(.90)");
+      shiftchildren[i].setAttribute("transform","translate(25," + topShift + ")");
     }
 
     var node = document.createElement("div");
@@ -523,43 +538,15 @@ $( ".venn" ).on( "click", ".printMe", function() {
     node.appendChild(cln);
     document.body.appendChild(node);
 
-    var titletext = $( "#past dt" ).last().text();
-    if (titletext.length > 40) {
-      var multiline = 1;
-    }
-
-    var writecredit = d3.select("#printvenn").append("text")
-      .text("Made with PubVenn: https://pubvenn.appspot.com/")
-      .attr("font-size",".9em")
-      .attr("x","25")
-      .attr("y","700");
-
+    appendText("Made with PubVenn: https://pubvenn.appspot.com/", "darkgrey", 25, topShift+680, "credit", ".9em");
     var styletext = d3.select("#printvenn").selectAll("text").style("font-family", "sans-serif");
-
-    if (!multiline) {
-      var writetitle = d3.select("#printvenn").append("text")
-        .text(titletext)
-        .attr("font-size","2em")
-        .attr("class","printable-title")
-        .attr("x","20")
-        .attr("y","45");
-    } else {
-        titletext = titletext.split(" ");
-        var titlepart1 = titletext.slice(0, 7).join(" ");
-        var titlepart2 = titletext.slice(7).join(" ");
-        var writetitle = d3.select("#printvenn").append("text")
-          .text(titlepart1)
-          .attr("font-size","1.5em")
-          .attr("class","printable-title")
-          .attr("x","20")
-          .attr("y","30");
-        var writetitle2 = d3.select("#printvenn").append("text")
-          .text(titlepart2)
-          .attr("font-size","1.5em")
-          .attr("class","printable-title")
-          .attr("x","20")
-          .attr("y","55");
-        }
+    appendText(titleparts.shift(), "black", 20, 45, "printable-title", "2em");
+    while (titleparts.length) {
+      d3.selectAll(".printable-title").append("tspan")
+        .text(titleparts.shift())
+        .attr('x', 20)
+        .attr('dy', "1.1em");
+    }
 
     var styletitle = d3.selectAll(".printable-title")
       .style("font-family", "Century Gothic, Helvetica, sans-serif");
@@ -568,11 +555,24 @@ $( ".venn" ).on( "click", ".printMe", function() {
       .attr("title", "test2")
       .attr("version", 1.1)
       .attr("xmlns", "http://www.w3.org/2000/svg").node();
-    console.log(xml);
+
     var xmlString = (new XMLSerializer).serializeToString(xml);
     var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
     $( "#printable-stuff" ).append('<img src="' + data_uri + '">');
     $("#printable").css("display", "block");
+
+    function appendText(text, color, x, y, textClass, size) {
+          d3.select("#printvenn").append("text")
+            .text(text)
+            .attr("font-size", size)
+            .attr("x", x)
+            .attr("y", y)
+            .attr("class",textClass)
+            .attr("fill", color);
+    }
+
+
+
     });
 
 $(".close").click(function(){
