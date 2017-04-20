@@ -552,10 +552,12 @@ $( ".venn" ).on( "click", ".printMe", function() {
       .style("font-family", "Century Gothic, Helvetica, sans-serif");
 
     var xml = d3.select("#printvenn")
+      .style("background-color", 'white')
       .attr("title", "test2")
       .attr("version", 1.1)
       .attr("xmlns", "http://www.w3.org/2000/svg").node();
 
+    //console.log(xml);
     var xmlString = (new XMLSerializer).serializeToString(xml);
     var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
     $( "#printable-stuff" ).append('<img src="' + data_uri + '">');
