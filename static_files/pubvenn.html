@@ -82,6 +82,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 				<dl></dl>
 			</div>
 		</div>
+
 	</div>
 
 	<div class="col-sm-12 col-md-4 col-lg-5">
@@ -97,9 +98,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 			<div class="panel-footer"></div>
 		</div>
 	</div>
-	<div id="hidden" class="hideMe"></div>
 
+
+	<div id="hidden" class="hideMe"></div>
 </div>
+
 </div>
 
 </div>
@@ -131,6 +134,13 @@ var searchCount = 0;
 //$("#search").val("");
 //$( "#detailed" ).prop( "checked", false );
 
+//Do we have a search or datespan specified in the querystring?
+if (location.search) {
+  var sharedsearch = decodeURIComponent(location.search.substr(1));
+  $( "#search" ).val( sharedsearch );
+  startSearch(sharedsearch);
+}
+
   $("#runsearch").click(function(){
      searchstr = $("#search").val();
      startSearch(searchstr);
@@ -153,6 +163,19 @@ var searchCount = 0;
 
    $( ".venn" ).on( "click", "#getCanvasimage", function() {
 	getCanvasimage();
+    });
+
+   //display sharing link
+   $( ".venn" ).on( "click", ".shareLink", function() {
+     var currentLocation = location.hostname + location.pathname;
+     searchstr = $("#search").val();
+     var shareUrl = currentLocation + "?" + encodeURIComponent(searchstr);
+     $( "#printable-stuff" ).append('<p>Copy this link your clipboard to share: <input type="text" id="sharingUrlcontent"></p>');
+     //$( "textarea" ).attr( "rows", "width: 40em;" );
+     $( "#sharingUrlcontent" ).attr( "style", "width: 40em;" );
+     $( "#sharingUrlcontent" ).attr( "value", shareUrl );
+     $("#printable").css("display", "block");
+     $( "#sharingUrlcontent" ).select();
     });
 
 function pastsearches (searchstr) {
@@ -496,8 +519,9 @@ var setid = d3.select("svg").attr("id","venn");
 $( ".diaginfo" ).removeClass( "hideMe" );
 
 $( ".venn" ).append('<p><a href="#!" class="printMe">Printable version</a></p>');
-
+$( ".venn" ).append('<p>Share this search: <a href="#!" class="shareLink">Link</a></p>');
 }
+
 
 
 //Printable modal stuff
@@ -518,9 +542,6 @@ $( ".venn" ).on( "click", ".printMe", function() {
     }
 
     var topShift = (titleparts.length*25)+20;
-
-    $( "#printable img" ).remove();
-    $( "#printvenn" ).remove();
 
     var itm = document.getElementById("venn");
     var cln = itm.cloneNode(true);
@@ -579,15 +600,22 @@ $( ".venn" ).on( "click", ".printMe", function() {
     });
 
 $(".close").click(function(){
-  $("#printable").css("display", "none");
+      clearPrint();
       });
 
 $(document).click(function(event) {
    var closeit = document.getElementById('printable');
    if (event.target == closeit) {
-      $("#printable").css("display", "none");
+      clearPrint();
       }
       });
+
+ function clearPrint () {
+   $( "#printable img" ).remove();
+   $( "#printable p" ).remove();
+   $( "#printvenn" ).remove();
+   $("#printable").css("display", "none");
+ }
 
 })
 ();
