@@ -574,7 +574,7 @@ $( ".venn" ).on( "click", ".printMe", function() {
 
     while (titletext.length) {
       var partText = [];
-      for (i = 0; i < 6; i++) {
+      for (i = 0; i < 4; i++) {
         partText.push(titletext.shift());
         if (titletext.length == 0) { break; }
       }
@@ -603,7 +603,7 @@ $( ".venn" ).on( "click", ".printMe", function() {
 
     appendText("Made with PubVenn: https://pubvenn.appspot.com/", "darkgrey", 25, topShift+680, "credit", ".9em");
     var styletext = d3.select("#printvenn").selectAll("text").style("font-family", "sans-serif");
-    appendText(titleparts.shift(), "black", 20, 45, "printable-title", "2em");
+    appendText(titleparts.shift(), "black", 20, 45, "printable-title", "1.75em");
     while (titleparts.length) {
       d3.selectAll(".printable-title").append("tspan")
         .text(titleparts.shift())
