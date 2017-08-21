@@ -395,50 +395,35 @@ function startSearch(term) {
 	if (!detailed.checked ) {
     //check for parentheses in our search string
     var termsarray = [];
+    var parensdex = 0;
+
     findParens(term);
 
     function findParens() {
-    var parensdex = 0;
     if ((term.lastIndexOf(")")) > -1) {
       var n = term.indexOf("(");
       for(var i=n; i < term.length; i++){
         if(term.charAt(i) == '(') { parensdex+=1 }
         if(term.charAt(i) == ')') { parensdex-=1 }
-        if(parensdex == 0){
-          parenTerm = term.substring(n,i+1);
+        if( parensdex == 0 && /\(/g.test(term) ) {
+          parenTerm = term.slice(n,i+1);
           termsarray.push(parenTerm);
-          console.log(termsarray);
-          termPartone = term.substring(0,n);
-          termParttwo = term.substring(i+1);
+          //console.log(termsarray);
+          termPartone = term.slice(0,n);
+          termParttwo = term.slice(i+1);
           term = termPartone + termParttwo;
           findParens(term);
         }
       }
       } else { return; }
     }
-    /*while ((term.lastIndexOf("(")) > -1) {
-      var n = term.lastIndexOf("(");
-      for(var i=n; i < term.length; i++){
-      	if(term.charAt(i) == ')'){
-          parenTerm = term.substring(n,i+1);
-          //parenTerm = partCleaner(parenTerm);
-        	termsarray.push(parenTerm);
-          console.log(termsarray);
-          termPartone = term.substring(0,n);
-          termParttwo = term.substring(i+1);
-          term = termPartone + termParttwo;
-        }
-      }
-    } */
-    //console.log(term);
+    //console.log("final term: " + term);
     var termsarray2 = term.split(/ and | or | not /i);
-
     termsarray.push.apply(termsarray, termsarray2);
     var termsarray = termsarray.filter(function(val) {
       return !(val === "" || typeof val == "undefined" || val === null || val == " AND " || val == "( AND )" || val == " OR " || val == "( OR )" || val == " NOT " || val == "( NOT )");
     });
     termsarray = partCleaner(termsarray);
-
     console.log(termsarray);
     var possibleTerms = termsarray.length;
 		if (data.esearchresult.errorlist) {
