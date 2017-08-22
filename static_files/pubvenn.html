@@ -279,7 +279,7 @@ var overlapcount = 0;
 
 for (index = 0; index < sets.length; index++) {
      for (j = index; j < (sets.length - 1); j++) {
-         search = sets[index].label + " AND " + sets[j+1].label
+         search = "(" + sets[index].label + ") AND (" + sets[j+1].label + ")";
 	 //send sets and terms to our temporary 'search' object
 	 mySearch = new setSearch([index,(j+1)], search);
          searches.push(mySearch);
