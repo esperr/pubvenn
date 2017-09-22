@@ -330,7 +330,7 @@ function getDocs(data) {
      var uids = result.uids;
      var  i = 0;
      while (i < uids.length) {
-         $("#vennresults dl").append("<dt>" + '<a href="https://www.ncbi.nlm.nih.gov/pubmed/' + result[uids[i]].uid + '">' + result[uids[i]].title + '</a></dt>');
+         $("#vennresults dl").append("<dt>" + '<a href="https://www.ncbi.nlm.nih.gov/pubmed/' + result[uids[i]].uid + '" target="_pmresults" >' + result[uids[i]].title + '</a></dt>');
 	var names = [];
 	var a = 0;
 	while (a < result[uids[i]].authors.length) {
@@ -348,7 +348,7 @@ function getDocs(data) {
      }
 
     $("#vennresults .panel-footer").empty();
-    $("#vennresults .panel-footer").append('See <a href="https://www.ncbi.nlm.nih.gov/pubmed/?term=' + translation.replace(/"/g, "%22") + '">more results on PubMed</a>');
+    $("#vennresults .panel-footer").append('See <a href="https://www.ncbi.nlm.nih.gov/pubmed/?term=' + translation.replace(/"/g, "%22") + '" target="_pmresults">more results on PubMed</a>');
       });
 
 }
@@ -420,10 +420,10 @@ function startSearch(term) {
     //console.log("final term: " + term);
     var termsarray2 = term.split(/ and | or | not /i);
     termsarray.push.apply(termsarray, termsarray2);
+    termsarray = partCleaner(termsarray);
     var termsarray = termsarray.filter(function(val) {
       return !(val === "" || typeof val == "undefined" || val === null || val == " AND " || val == "( AND )" || val == " OR " || val == "( OR )" || val == " NOT " || val == "( NOT )");
     });
-    termsarray = partCleaner(termsarray);
     console.log(termsarray);
     var possibleTerms = termsarray.length;
 		if (data.esearchresult.errorlist) {
