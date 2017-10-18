@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">-->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
 <link rel="stylesheet" href="/css/custom.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <!--<script src="https://d3js.org/d3.v3.js"></script>-->
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="venn.js"></script>
@@ -63,13 +63,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <p>Use the "expanded subjects" option to see the myriad of terms that PubMed translates your search into before it gets run, as with <span class="pastsearch">cancer [expanded]</span> or <span class="pastsearch">heart disease [expanded]</span>.
 					Please note that due to the number of terms a search can get mapped to, the sets for expanded subjects can take a few seconds to render.</p>
 				</div>
+        <!--
         <div id="printable">
           <div id="printable-stuff">
           <span class="close">×</span>
-          <!--<canvas id="myCanvas2" width="700" height="700">
-            Your browser does not support the HTML5 canvas tag.</canvas>-->
+          <canvas id="myCanvas2">
+            Your browser does not support the HTML5 canvas tag.</canvas>
           </div>
         </div>
+      -->
 			</div>
 			<div class="diaginfo panel-footer hideMe">Select an area or intersection on the venn diagram to see citations from that part.</div>
 			</div>
@@ -107,6 +109,42 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 </div>
 
+<div id="sharing-link" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Share this search</h4>
+      </div>
+      <div class="modal-body">
+        <p>Copy this link your clipboard to share:
+        <input type="text" id="sharingUrlcontent"></p>
+      </div>
+      <div class="modal-footer">
+        <p>Copy the link above</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="printchart" class="modal modal-wide fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Printable Diagram</h4>
+      </div>
+      <div id="printImage" class="modal-body">
+        <canvas id="myCanvas2"></canvas>
+      </div>
+      <div class="modal-footer">
+        <p>Right click on image to save</p>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
     <footer class="footer">
       <div class="container">
         <span class="text-muted">  <p>Design and contruction by Ed Sperr, M.L.I.S. (<a href="mailto:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a>)   |
@@ -133,6 +171,9 @@ var mySearch;
 var searchCount = 0;
 //$("#search").val("");
 //$( "#detailed" ).prop( "checked", false );
+//why yes, this *is* super-hacky, why do you ask?
+var isIE = /*@cc_on!@*/false || !!document.documentMode;
+
 
 //Do we have a search or datespan specified in the querystring?
 if (location.search) {
@@ -170,11 +211,9 @@ if (location.search) {
      var currentLocation = location.protocol + '//'+ location.hostname + (location.port ? ':'+location.port: '') + location.pathname;
      searchstr = $("#search").val();
      var shareUrl = currentLocation + "?" + encodeURIComponent(searchstr);
-     $( "#printable-stuff" ).append('<p>Copy this link your clipboard to share: <input type="text" id="sharingUrlcontent"></p>');
-     //$( "textarea" ).attr( "rows", "width: 40em;" );
      $( "#sharingUrlcontent" ).attr( "style", "width: 40em;" );
      $( "#sharingUrlcontent" ).attr( "value", shareUrl );
-     $("#printable").css("display", "block");
+     $('#sharing-link').modal();
      $( "#sharingUrlcontent" ).select();
     });
 
@@ -552,7 +591,6 @@ $( ".venn" ).append('<p>Share this search: <a href="#!" class="shareLink">Link</
 
 //Printable modal stuff
 $( ".venn" ).on( "click", ".printMe", function() {
-
     var titletext = $( "#past dt" ).last().text();
     var titleparts = [];
     titletext = titletext.split(" ");
@@ -608,8 +646,23 @@ $( ".venn" ).on( "click", ".printMe", function() {
     //console.log(xml);
     var xmlString = (new XMLSerializer).serializeToString(xml);
     var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
-    $( "#printable-stuff" ).append('<img src="' + data_uri + '">');
-    $("#printable").css("display", "block");
+    if (isIE) {
+      $("#myCanvas2").attr("height", 0);
+      $( "#printImage" ).append('<img src="' + data_uri + '">');
+    } else {
+      var myCanvas = document.getElementById('myCanvas2');
+      $("#myCanvas2").attr("width", 700);
+      $("#myCanvas2").attr("height", topShift+700);
+      var ctx = myCanvas.getContext('2d');
+      var img = new Image;
+      img.onload = function(){
+        ctx.drawImage(img,0,0); // Or at whatever offset you like
+      };
+      img.src = data_uri;
+    }
+    //$("#printable").css("display", "block");
+    $('#printchart').modal();
+
 
     function appendText(text, color, x, y, textClass, size) {
           d3.select("#printvenn").append("text")
