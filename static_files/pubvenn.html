@@ -135,7 +135,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <h4 class="modal-title">Printable Diagram</h4>
       </div>
       <div id="printImage" class="modal-body">
-        <canvas id="myCanvas2"></canvas>
       </div>
       <div class="modal-footer">
         <p>Right click on image to save</p>
@@ -646,10 +645,11 @@ $( ".venn" ).on( "click", ".printMe", function() {
     //console.log(xml);
     var xmlString = (new XMLSerializer).serializeToString(xml);
     var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
+    $( "#printImage" ).empty();
     if (isIE) {
-      $("#myCanvas2").attr("height", 0);
       $( "#printImage" ).append('<img src="' + data_uri + '">');
     } else {
+      $( "#printImage" ).append('<canvas id="myCanvas2"></canvas>');
       var myCanvas = document.getElementById('myCanvas2');
       $("#myCanvas2").attr("width", 700);
       $("#myCanvas2").attr("height", topShift+700);
