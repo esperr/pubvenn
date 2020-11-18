@@ -166,6 +166,7 @@ var index;
 var myOverlap;
 var mySet;
 var mySearch;
+var pausetime;
 //var lastSearch = "";
 var searchCount = 0;
 //$("#search").val("");
@@ -237,9 +238,8 @@ function vennresults (d) {
      } else {
 	searchterms = d.label;
      }
-     esearch(searchterms)
-     .done(function( response ) {
-     getDocs(response);
+     psearch(searchterms, function( data ) {
+     getDocs(data);
       });
 }
 
@@ -260,44 +260,54 @@ function setSearch(sets, terms) {
     this.terms = terms;
 }
 
-function esearch(term) {
-     return $.ajax({
-	url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
-	data: {
-	db: 'pubmed',
-	usehistory: 'y',
-	term: term,
-	retmode: 'json',
-	retmax: 0,
-	email: 'ed_sperr@hotmail.com',
-  api_key: 'f069cf776feaa627ab9b1e0fc2b090610708',
-	tool: 'pubvenn'
-	}
-     });
+function psearch(searchstr, callback) {
+  checktime();
+
+  function checktime() {
+    var t1 = performance.now();
+    var timediff = t1 - pausetime;
+    if (timediff > 425) {
+      callutils();
+    } else {
+      setTimeout(checktime, 30);
+    }
+  }
+
+  function callutils() {
+    calltime = performance.now();
+    console.log(calltime - pausetime);
+    pausetime = calltime;
+    $.ajax({
+  	url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
+    error: function () {
+      startOver();
+      //alert("Oops, something went wrong. Please try again!")
+      return;
+    },
+  	data: {
+  	db: 'pubmed',
+  	usehistory: 'y',
+  	term: searchstr,
+  	retmode: 'json',
+  	retmax: 0,
+  	email: 'ed_sperr@hotmail.com',
+  	tool: 'pmsearchbench'
+    },
+    success: callback
+       });
+  }
+
 }
 
 function buildOLCounts(search) {
-  $.ajax({
-	url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
-	data: {
-	db: 'pubmed',
-	usehistory: 'y',
-	term: search.terms,
-	retmode: 'json',
-	retmax: 0,
-	email: 'ed_sperr@hotmail.com',
-  api_key: 'f069cf776feaa627ab9b1e0fc2b090610708',
-	tool: 'pubvenn'
-  },
-  success: function( data ) {
-	   myOverlap = new setOverlapSet(search.sets,data.esearchresult.count);
-	   sets.push(myOverlap);
-     if (!searches.length) {
-       drawVennDiagram ();
-       //drawPrintable ();
-     }
-  }
-     });
+  psearch(search.terms, function( data ) {
+    myOverlap = new setOverlapSet(search.sets,data.esearchresult.count);
+    sets.push(myOverlap);
+    if (!searches.length) {
+      drawVennDiagram ();
+      //drawPrintable ();
+    }
+  });
 }
 
 function getOLCounts() {
@@ -332,17 +342,19 @@ getOLCounts();
 }
 
 function getSimpleSets(termsarray, possibles) {
+  console.log(termsarray);
+
  $.each(termsarray, function (i, term) {
-     esearch(termsarray[i])
-     .then(function( data ) {
+   //for (term of termsarray) {
+     psearch(term, function( data ) {
 	var numResults = Number(data.esearchresult.count);
 	if (numResults != 0) {
-		mySet = new setSet(termsarray[i], numResults);
+		mySet = new setSet(term, numResults);
 		sets.push(mySet);
 	}
     if (sets.length >= possibles) { getOverlaps(); }
      });
-
+//}
     });
 }
 
@@ -395,6 +407,7 @@ function getDocs(data) {
 }
 
 function startSearch(term) {
+    pausetime = performance.now();
     //we clear the address bar...
     var ourLocation = location.pathname + "?" + term;
     history.replaceState({}, "No real title here", ourLocation);
@@ -415,8 +428,7 @@ function startSearch(term) {
 
     searchCount++;
      $( ".venn" ).append('<div class="vennMsg"><p>Loading your diagram. Please wait...</p><progress id="fetchresults" value="1" max="100"></progress></div> ');
-     esearch(term)
-     .then(function( data ) {
+     psearch(term, function( data ) {
 	getDocs(data);
         var numResults = Number(data.esearchresult.count);
 	var translation = data.esearchresult.querytranslation;
@@ -465,7 +477,6 @@ function startSearch(term) {
     var termsarray = termsarray.filter(function(val) {
       return !(val === "" || typeof val == "undefined" || val === null || val == " AND " || val == "( AND )" || val == " OR " || val == "( OR )" || val == " NOT " || val == "( NOT )");
     });
-    console.log(termsarray);
     var possibleTerms = termsarray.length;
 		if (data.esearchresult.errorlist) {
 			possibleTerms = possibleTerms - Number(data.esearchresult.errorlist.phrasesnotfound.length);
@@ -485,8 +496,6 @@ function startSearch(term) {
 		});
 		getOverlaps();
 	}
-}).fail(function() {
-    alert("Search failed");
 });
 }
 
